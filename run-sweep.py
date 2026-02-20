@@ -3,10 +3,10 @@ from sweep.sweep import sweep, load_json_data
 
 SIM_NAME = "emx" # fixed cannot chnage
 
-ARTWORKS = "/mnt/storage/armin/batch-sweep/artworks"
+ARTWORKS = "/mnt/storage/shared/artworks"
 
-SIM_CONFIG = "/mnt/storage/armin/batch-sweep/sim-config.json"
-SWEEP = "/mnt/storage/armin/batch-sweep/sweep-config.json"
+SIM_CONFIG = "/mnt/storage/shared/sim-config.json"
+SWEEP = "/mnt/storage/shared/sweep-config.json"
 
 GENERATE_LAYOUT = True
 GENERATE_SVG = True
