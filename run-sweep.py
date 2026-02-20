@@ -21,6 +21,7 @@ for artwork in os.listdir(ARTWORKS):
         load_json_data(SWEEP),
         load_json_data(SIM_CONFIG),
         "output",
+        None,
         GENERATE_LAYOUT,
         GENERATE_SVG,
         RUN_SIM,

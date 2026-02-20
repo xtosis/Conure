@@ -1,0 +1,17 @@
+{
+    "total_permutations": 3,
+    "completed_runs": 3,
+    "current_run": "RunID_0002",
+    "current_task": {
+        "layout": {
+            "status": "completed"
+        },
+        "svg": {
+            "status": "completed"
+        },
+        "simulation": {
+            "status": "pending"
+        }
+    },
+    "progress_percentage": 100.0
+}
