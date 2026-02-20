@@ -8,9 +8,12 @@ export default defineConfig(({ mode }) => {
   const target = `${env.VITE_API_HOST}:${env.VITE_BACKEND_PORT}`
   console.log('Proxy target is:', target)
 
+  const port = Number(env.VITE_FRONTEND_PORT) || 7173
+
   return {
     plugins: [react()],
     server: {
+      port: port,
       proxy: {
         '/api': {
           target,
