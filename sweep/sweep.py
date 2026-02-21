@@ -200,49 +200,49 @@ def sweep(simulator, artworkData, sweepParam, simulatorConfig, base_output_dir, 
     total_permutations = len(permutations)
     width = max(4, len(str(total_permutations)))
     logger.info("Total number of permutations: %d", total_permutations)
-    
+
     status_file_path = os.path.join(base_output_dir, "status.json")
     checkpoint_file_path = os.path.join(base_output_dir, "checkpoint.json")
     checkpoint_db = load_checkpoint_db(checkpoint_file_path)
     RunID = 0
     completedRuns = 0
-    
+
     default_task_status = {
         "layout": {"status": "pending"},
         "svg": {"status": "pending"},
         "simulation": {"status": "pending"}
     }
     update_status(status_file_path, total_permutations, completedRuns, "N/A", default_task_status)
-    
+
     for permutation in permutations:
         run_key = f"RunID_{RunID:0{width}d}"
         run_record = checkpoint_db.get("runs", {}).get(run_key, {})
         layout_done = run_record.get("layout_completed", False)
         svg_done = run_record.get("svg_completed", False)
         simulation_done = run_record.get("simulation_completed", False)
-        
+
         if enableSimulation and simulation_done:
             logger.warning("Simulation for %s already completed. Skipping simulation step.", run_key)
-        
+
         run_artwork = copy.deepcopy(artworkData)
         run_output_dir = os.path.join(base_output_dir, run_key)
         os.makedirs(run_output_dir, exist_ok=True)
-        
+
         if outputName is None:
             run_name = run_artwork["metadata"]["name"] + "_" + run_key
         else:
             run_name = outputName + "_" + run_key
         run_artwork["metadata"]["name"] = run_name
-        
+
         logger.info("RunID: %d, Permutation: %s, Run Name: %s", RunID, permutation, run_name)
-        
+
         run_parameters_json_path = os.path.join(run_output_dir, "parameters.json")
         if not os.path.exists(run_parameters_json_path):
             runData = {"runID": RunID, "parameters": {}}
             for i, param in enumerate(sweepPar):
                 run_artwork["parameters"][param] = permutation[i]
                 runData["parameters"][param] = permutation[i]
-            runData["parameters"]["rings"] = run_artwork["parameters"].get("rings", None)
+            # runData["parameters"]["rings"] = run_artwork["parameters"].get("rings", None)
             with open(run_parameters_json_path, "w") as parfile:
                 json.dump(runData, parfile, indent=4)
             update_checkpoint(run_key, checkpoint_db, checkpoint_file_path, {"parameters": runData["parameters"],
@@ -250,12 +250,12 @@ def sweep(simulator, artworkData, sweepParam, simulatorConfig, base_output_dir, 
         artwork_json_path = os.path.join(run_output_dir, run_name + "_artwork.json")
         with open(artwork_json_path, "w") as f:
             json.dump(run_artwork, f, indent=4)
-        
+
         portCount = len(run_artwork["ports"]["config"].get("simulatingPorts", []))
         gdsPath = os.path.join(run_output_dir, run_name + ".gds")
         svgPath = os.path.join(run_output_dir, run_name + ".svg")
         sParamPath = os.path.join(run_output_dir, run_name + f".s{portCount}p")
-        
+
         if (enableLayoutGeneration or enableSimulation):
             if os.path.exists(gdsPath) and layout_done and not force:
                 logger.warning("GDS file for %s already exists. Skipping layout generation.", run_key)
@@ -267,7 +267,7 @@ def sweep(simulator, artworkData, sweepParam, simulatorConfig, base_output_dir, 
                 needs_layout = True
         else:
             needs_layout = False
-        
+
         if generateSVG:
             if os.path.exists(svgPath) and svg_done and not force:
                 logger.warning("SVG for %s already exists. Skipping SVG generation.", run_key)
@@ -279,7 +279,7 @@ def sweep(simulator, artworkData, sweepParam, simulatorConfig, base_output_dir, 
                 needs_svg = True
         else:
             needs_svg = False
-        
+
         if needs_layout or needs_svg:
             task_status = {
                 "layout": {"status": "in progress", "last_updated": get_timestamp()} if needs_layout else {"status": "completed"},
@@ -303,7 +303,7 @@ def sweep(simulator, artworkData, sweepParam, simulatorConfig, base_output_dir, 
                 command.append("--verbose")
             if log_level:
                 command.extend(["--log-level", log_level])
-            
+
             logger.debug("Running artwork generation command")
             process = subprocess.run(command)
             if process.returncode == 0:
@@ -318,7 +318,7 @@ def sweep(simulator, artworkData, sweepParam, simulatorConfig, base_output_dir, 
                     update_checkpoint(run_key, checkpoint_db, checkpoint_file_path, {"layout_completed": False})
                 if needs_svg:
                     update_checkpoint(run_key, checkpoint_db, checkpoint_file_path, {"svg_completed": False})
-        
+
         if enableSimulation and os.path.exists(gdsPath) and not os.path.exists(sParamPath):
             task_status = {
                 "layout": {"status": "completed"},
@@ -353,7 +353,7 @@ def sweep(simulator, artworkData, sweepParam, simulatorConfig, base_output_dir, 
             else:
                 logger.error("Simulation failed for %s with code %d", run_key, process.returncode)
                 update_checkpoint(run_key, checkpoint_db, checkpoint_file_path, {"simulation_completed": False})
-        
+
         completedRuns += 1
         task_status = {
             "layout": {"status": "completed"},
@@ -377,7 +377,7 @@ def pack_simulation_data(sweep_dir):
     feature_names = None
     target_names = None
     frequency_points = None
-    
+
     for run_folder in os.listdir(sweep_dir):
         if run_folder.startswith('RunID'):
             run_path = os.path.join(sweep_dir, run_folder)
@@ -413,7 +413,7 @@ def pack_simulation_data(sweep_dir):
                 targets_list.append(s_real_imag)
             else:
                 logger.warning("No touchstone file found for %s", run_folder)
-    
+
     if not targets_list:
         logger.warning("No touchstone files found. Skipping packing operation.")
         return
