@@ -1,26 +1,14 @@
 import os
 from sweep.sweep import sweep, load_json_data
-
-SIM_NAME = "emx" # fixed cannot chnage
-
-ARTWORKS = "/mnt/storage/shared/artworks"
-
-SIM_CONFIG = "/mnt/storage/shared/sim-config.json"
-SWEEP = "/mnt/storage/shared/sweep-config.json"
-
-GENERATE_LAYOUT = True
-GENERATE_SVG = True
-RUN_SIM = False
-PACK = True
+from configs.run_sweep import *
 
 for artwork in os.listdir(ARTWORKS):
-    output_dir = ""
     sweep(
         SIM_NAME,
         load_json_data(f'{ARTWORKS}/{artwork}'),
         load_json_data(SWEEP),
-        load_json_data(SIM_CONFIG),
-        "output",
+        SIM_CONFIG,
+        f"output/{artwork.replace(".json", "")}",
         None,
         GENERATE_LAYOUT,
         GENERATE_SVG,

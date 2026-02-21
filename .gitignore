@@ -10,3 +10,5 @@ start_uix.log
 data/
 data
 **/.DS_Store
+configs*
+test.py
