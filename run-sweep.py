@@ -12,8 +12,8 @@ RUN_SIM = True
 PACK = True
 
 _JOB_PATH = "/mnt/storage/shared/jobs/" + JOB_NAME
-_CONFIGS = _JOB_PATH + "/_CONFIGS/"
-_ARTWORKS = _CONFIGS + "_ARTWORKS"
+_CONFIGS = _JOB_PATH + "/configs/"
+_ARTWORKS = _CONFIGS + "artworks"
 
 for artwork in os.listdir(_ARTWORKS):
     sweep(
